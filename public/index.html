@@ -3,11 +3,12 @@
   <meta charset="utf-8">
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <link href="stylesheet_full.css" rel="stylesheet">
-  
+
 
 </head>
 
 <body>
+  
 <div class = "viz" id="vis">
   <button id="play-button">Play</button>
 </div>
@@ -17,6 +18,7 @@
 </select> 
 <script>
   //JAVASCRIPT VIS CODE STARTS HERE 
+  //working version with reshaping of the screen
 // define async function to load the data files. all other code is in the function create_vis() which is executed at the bottom of the script to run once the data have loaded
 async function loadFiles() {
     let tracks_PS_restructured = await d3.json("./tracks_full_restructured_14_11_12.json");
@@ -58,17 +60,77 @@ var ymax = 55;
 var margin = {top:50, right:100, bottom:100, left:100},
    // height = 1200 - margin.top - margin.bottom,
     //width = (height+margin.top+margin.bottom)*Math.cos(0.5*(ymin+ymax)*Math.PI/180)*(xmax-xmin)/(ymax-ymin) - margin.left - margin.right;
-    height = 1100,
+    height = 1200,
     width = 700,
 
 // width in pixels of map svg:
 chartWidth = width+margin.left+margin.right;
 
+
+//code adapted from https://brendansudol.com/writing/responsive-d3
+function responsivefy(svg) {
+    // get container + svg aspect ratio
+    var container = d3.select(svg.node().parentNode),
+        width = parseInt(svg.style("width")),
+        height = parseInt(svg.style("height")),
+        aspect = width / height;
+
+    // add viewBox and preserveAspectRatio properties,
+    // and call resize so that svg resizes on inital page load
+    svg.attr("viewBox", "0 0 " + width + " " + height)
+        .attr("perserveAspectRatio", "xMinYMid")
+        .call(resize);
+
+    // to register multiple listeners for same event type, 
+    // you need to add namespace, i.e., 'click.foo'
+    // necessary if you call invoke this function for multiple svgs
+    // api docs: https://github.com/mbostock/d3/wiki/Selections#on
+    d3.select(window).on("resize." + container.attr("id"), resize);
+
+    // get width of container and resize svg to fit it
+    function resize() {
+        var targetWidth = parseInt(container.style("width"));
+        //resize based on width only
+        //var targetHeight = targetWidth / aspect;
+        //svg.attr("width", targetWidth);
+        //svg.attr("height", Math.round(targetHeight));
+        
+        //resize based on height only
+        //var targetHeight = parseInt(container.style("height"));
+        //var targetWidth = aspect/targetHeight;
+        //svg.attr("width", targetWidth);
+        //svg.attr("height", Math.round(targetHeight));
+        
+        //resize based on width and height depending on the aspect ratio
+        if (targetWidth>width){
+          var targetHeight = parseInt(container.style("height"));
+          svg.attr("width", targetHeight/aspect);
+          svg.attr("height", Math.round(targetHeight));
+        }
+        
+        else{
+          var targetHeight = targetWidth / aspect;
+          svg.attr("width", targetWidth);
+          svg.attr("height", Math.round(targetHeight));
+        }
+        }
+    }
+
+
+
+
 // create svg element to contain the vis (including the slider too)
-var svg = d3.select("#vis")
+//var svg = d3.select("#vis")
+//    .append("svg")
+//    .attr("width", width + margin.left + margin.right)
+//    .attr("height", height + margin.top + margin.bottom);
+// the one above is what we used before^ 
+ var svg = d3.select("#vis")
     .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom);
+    //.attr("viewbox", '0 0 700 1100')
+    .attr("width", 700)
+    .attr("height", 1200)
+    .call(responsivefy);
 
 // var scrubber = d3.select("#vis")
 //     .append("svg")
@@ -98,7 +160,8 @@ var x = d3.scaleLinear()
 // create group to hold the slider:
 var slider = svg.append("g")
     .attr("class", "slider")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+    //.call(responsivefy);//??????
 
 // draw the slider: 
 slider.append("line")
@@ -169,7 +232,8 @@ playButton.on("click", function() {
 // create svg for the drifter map (fiddle with this bit to move plot):
 var scatterPlot = svg.append("g")
     .attr("class", "scatterplot")
-    // .attr("transform", "translate(" + margin.left +"," + 250 + ")");
+    //.attr("viewbox", '0 0 400 600')
+    //.attr("transform", "translate(" + margin.left +"," + 250 + ")");//????????
 
 // function to restructure coast json file into format required to plot:
 function reorder_cf(d){return coast_file[d].x.map(function(item, index) {  // combine x and y so that each point is an individual object
