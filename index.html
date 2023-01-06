@@ -20,7 +20,9 @@
   //JAVASCRIPT VIS CODE STARTS HERE 
   //working version with reshaping of the screen
 // define async function to load the data files. all other code is in the function create_vis() which is executed at the bottom of the script to run once the data have loaded
-async function loadFiles() {
+//<script src="d3v7.min.js">
+//<script src="http://d3js.org/d3.v7.min.js">
+  async function loadFiles() {
     let tracks_PS_restructured = await d3.json("./tracks_full_restructured_14_11_12.json");
     let tracks_PS = await d3.json("./tracks_full_restructured_14_11_12.json");
     let coast_xy = await d3.json("./coast_xy.json");
