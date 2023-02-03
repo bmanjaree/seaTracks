@@ -142,6 +142,7 @@ body {
     color: #696969;
   }
 /* Define position and appearance of play button: */
+/*deleted the play button placement here
 #play-button {
     position: relative;
     bottom: 1140px;
@@ -157,6 +158,8 @@ body {
     cursor: pointer;
     height: 30px;
   }
+  here*/
+
 /* Change appearance of play button on mouse hover: */
 #play-button:hover {
     background-color: #696969;
@@ -180,6 +183,8 @@ body {
     stroke: #dcdcdc;
     stroke-width: 8px;
   }
+  
+  
 /* set appearance of slider button: */
 .track-overlay {
     pointer-events: stroke;
@@ -207,5 +212,6 @@ body {
     top: 10px;
     left: 0;
   }
+  
     
   }
